@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Wall</title>
+</head>
+<body class="bg-info">
+    <div>
+        <nav class="d-flex justify-content-between align-items-center col-12 bg-dark">
+            <h1 class="text-light p-4">CodingDojo Wall</h1>
+            <div class="d-flex col-4 p-4 justify-content-end">
+                <h2 class="text-light">Welcome, {{user.first_name}}!!</h2>
+                <a href="/logout" class = "btn btn-danger m-2">Log Out</a>
+            </div>
+        </nav>
+    </div>
+    <div class="d-flex justify-content-around col-11 m-5">
+        <div class="bg-secondary p-5">
+            <h2 class="p-3"> <span class="text-warning">{{messages|length}}</span> Message(s) for You</h2>
+            {% for message in messages %}
+            <div class="card-body border border-dark w-75 p-3 col-12 mx-auto bg-light">
+                <h3> {{message.sender}} said <span class="text-warning">({{message.time_span()}})</span>:</h3>
+                <p>{{message.message_content}}</p>
+                <a href="/destroy/message/{{message.id}}" class="btn btn-danger">Delete</a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="bg-secondary p-5">
+            {% with messages = get_flashed_messages(category_filter=['message']) %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="card-body border border-dark w-50 p-3 col-6 mx-auto bg-danger"> {{message}} </p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <h2 class="p-3">Send Messages</h2>
+            <p class="text-info">You have sent <span class="text-warning"> {{messages_sent|length}} </span>message(s) so far.</p>
+            {% for u in users %}
+                {% if u.id != session.user_id %}
+                    <div class="d-flex flex-wrap">
+                        <form action="/post/message" method="POST">
+                        <input type="hidden" name="sender" value={{session.user_first_name}}>
+                        <input type="hidden" name="sender_id" value={{session.user_id}}>
+                        <input type="hidden" name="recipient" value={{u.first_name}}>
+                        <input type="hidden" name="recipient_id" value={{u.id}}>
+                            <label>
+                                Message {{u.first_name}}:
+                                <textarea name="message_content" cols="20" rows="5" value="user_id" class="form-control"></textarea>
+                                <input type="submit" value="Send" class="btn btn-success form-control">
+                            </label>
+                        </form>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
